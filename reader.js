@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const model = require('./ArduinoModel');
 const sp = require('serialport');
 
-const uristring = '***REMOVED***';
+const uristring = 'URL';
 const SerialPort = sp.SerialPort;
 const serialport = new SerialPort("/dev/ttyACM0", {
     parser: SerialPort.parsers.readline('\n')
