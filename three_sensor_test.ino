@@ -1,7 +1,9 @@
 #include <SFE_BMP180.h>
 #include <Wire.h>
 
-
+// Most code pieced together from Arduino example libraries and 
+// http://bildr.org/2012/11/sht15-arduino/
+// http://arduinodev.woofex.net/2012/12/01/standalone-sharp-dust-sensor/
 // BMP180 
 // You will need to create an SFE_BMP180 object, here called "pressure":
 SFE_BMP180 pressure;
