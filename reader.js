@@ -1,3 +1,4 @@
+'use strict'
 const mongoose = require('mongoose');
 const model = require('./ArduinoModel');
 const sp = require('serialport');

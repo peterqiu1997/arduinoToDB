@@ -5,7 +5,6 @@
 // http://bildr.org/2012/11/sht15-arduino/
 // http://arduinodev.woofex.net/2012/12/01/standalone-sharp-dust-sensor/
 // BMP180 
-// You will need to create an SFE_BMP180 object, here called "pressure":
 SFE_BMP180 pressure;
 double baseline; // baseline pressure
 
@@ -13,7 +12,7 @@ double baseline; // baseline pressure
 int SHT_clockPin = 3;  // pin used for clock
 int SHT_dataPin  = 2;  // pin used for data
 
-// Sharp Sensor Stuff
+// Sharp Sensor 
 int measurePin = 3;
 int ledPower = 12;
  
@@ -71,7 +70,7 @@ void loop()
  
   // 0 - 5.0V mapped to 0 - 1023 integer values
   // recover voltage
-  calcVoltage = voMeasured * (5.0 / 1024);
+  calcVoltage = voMeasured * (5.0 / 1024); // change from 3v3 -> 5
  
   // linear equation taken from http://www.howmuchsnow.com/arduino/airquality/
   // Chris Nafis (c) 2012
@@ -88,6 +87,9 @@ void loop()
   // DELAY---------------------------------------------------------
   delay(1000);
 }
+
+// 121-142 reading in class 10,000, roughly same in class 100
+// 
 
 
 double getPressure()
