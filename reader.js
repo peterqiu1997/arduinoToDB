@@ -2,20 +2,21 @@
 const mongoose = require('mongoose');
 const model = require('./ArduinoModel');
 const sp = require('serialport');
+const cfg = require('./config');
 
 // read from arduino
-const uristring = '***REMOVED***';
+const uristring = cfg.uristring;
 const SerialPort = sp.SerialPort;
 const serialport = new SerialPort("/dev/cu.usbmodem1411", {
     parser: SerialPort.parsers.readline('\n')
 });
 
 // set up twilio CHANGE THIS BEFORE COMMITTING
-const accountSid = '***REMOVED***';
-const authToken = '***REMOVED***';
-const client = require('twilio')(accountSid, authToken);
-const NUMBERS = ['510-789-3847']; //'408-693-6790', '408-832-5830', 
-const FROM_NUMBER = '650-285-1722';
+const accountSID = cfg.accountSID;
+const authToken = cfg.authToken;
+const NUMBERS = cfg.NUMBERS; //'408-693-6790', '408-832-5830', 
+const FROM_NUMBER = cfg.FROM_NUMBER;
+const client = require('twilio')(accountSID, authToken);
 
 const saveInterval = 1000;
 let newPoint = {},
@@ -34,7 +35,6 @@ serialport.on('open', function(){
 
 const handleData = function(data) {
     const dataArray = data.split(',');
-    console.log(dataArray);
     if (dataArray.length === 6) {
         checkCall(dataArray[5]);
         uploading = true;
