@@ -14,7 +14,7 @@ const serialport = new SerialPort("/dev/cu.usbmodem1411", {
 // set up twilio CHANGE THIS BEFORE COMMITTING
 const accountSID = cfg.accountSID;
 const authToken = cfg.authToken;
-const NUMBERS = cfg.NUMBERS; //'408-693-6790', '408-832-5830', 
+const NUMBERS = cfg.NUMBERS; 
 const FROM_NUMBER = cfg.FROM_NUMBER;
 const client = require('twilio')(accountSID, authToken);
 
@@ -51,7 +51,7 @@ const checkCall = function(count) {
     const now = Date.now();
     if (count >= 0.07 && now > (lastCall + 300000)) {
         for (let i = 0; i < NUMBERS.length; i += 1) {
-            client.messages.create({
+            /*client.messages.create({
                 to: NUMBERS[i],
                 from: FROM_NUMBER,
                 body: 'somethings afoot in the cleanroom - sent at: ' + 
@@ -60,7 +60,7 @@ const checkCall = function(count) {
                 if (err) {
                     console.log(err);
                 }
-            });
+            });*/
         }
         lastCall = now;
     }

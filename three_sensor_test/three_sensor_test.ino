@@ -70,7 +70,7 @@ void loop()
  
   // 0 - 5.0V mapped to 0 - 1023 integer values
   // recover voltage
-  calcVoltage = voMeasured * (5.0 / 1024); // change from 3v3 -> 5
+  calcVoltage = voMeasured * (5.0 / 1024.0); // change from 3v3 -> 5
  
   // linear equation taken from http://www.howmuchsnow.com/arduino/airquality/
   // Chris Nafis (c) 2012
