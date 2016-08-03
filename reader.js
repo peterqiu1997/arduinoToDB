@@ -1,27 +1,29 @@
-'use strict'
+'use strict';
 const mongoose = require('mongoose');
+const fs = require('fs');
 const model = require('./ArduinoModel');
 const sp = require('serialport');
 const cfg = require('./config');
 
 // read from arduino
 const uristring = cfg.uristring;
-const SerialPort = sp.SerialPort;
-const serialport = new SerialPort("/dev/cu.usbmodem1411", {
+const SerialPort = sp.SerialPort; 
+const serialport = new SerialPort("/dev/cu.usbmodem1411", { // replace with your port
     parser: SerialPort.parsers.readline('\n')
 });
 
-// set up twilio CHANGE THIS BEFORE COMMITTING
 const accountSID = cfg.accountSID;
 const authToken = cfg.authToken;
 const NUMBERS = cfg.NUMBERS; 
 const FROM_NUMBER = cfg.FROM_NUMBER;
 const client = require('twilio')(accountSID, authToken);
 
-const saveInterval = 1000;
+const saveInterval = 1000,
+      fiveMinutes = 300000;
 let newPoint = {},
     uploading = false,
-    lastCall = 0;
+    lastCall = 0,
+    lastDelete = 0;
 
 mongoose.connect(uristring, function(err, res) {
     if (err) {
@@ -49,24 +51,43 @@ const handleData = function(data) {
 
 const checkCall = function(count) {
     const now = Date.now();
-    if (count >= 0.07 && now > (lastCall + 300000)) {
+    if (count >= 0.07 && now > (lastCall + fiveMinutes)) {
         for (let i = 0; i < NUMBERS.length; i += 1) {
-            /*client.messages.create({
+            client.messages.create({
                 to: NUMBERS[i],
                 from: FROM_NUMBER,
-                body: 'somethings afoot in the cleanroom - sent at: ' + 
+                body: 'Check the cleanroom! Sent at: ' + 
                        new Date(now).toString().split(' ').slice(0, 4).join(' ')
             }, function (err, message) {
                 if (err) {
                     console.log(err);
                 }
-            });*/
+            });
         }
         lastCall = now;
     }
 }
 
 const save = setInterval(function() {
+    console.log(lastDelete);
+    if (Date.now() > lastDelete + 172800000) {
+        model.find({}).exec(function(err, data) {
+            const now = new Date(Date.now()).toString().split(' ').slice(0,5).join(' ');
+            const stream = fs.createWriteStream('./files/' + now + '_JSON_Output.txt');
+            stream.write(JSON.stringify(data));
+            stream.on('finish', function() {
+                model.find({}).remove(function(err, res) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('Successfully written and deleted documents.');
+                    }
+                });
+            });
+        });
+        lastDelete = Date.now();
+    }
+    
     if (uploading) {
         newPoint.save(function(err) {
             if (err) { 
