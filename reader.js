@@ -6,7 +6,6 @@ const sp = require('serialport');
 const cfg = require('./config');
 
 // read from arduino
-const uristring = cfg.uristring;
 const SerialPort = sp.SerialPort; 
 const serialport = new SerialPort("/dev/cu.usbmodem1411", { // replace with your port
     parser: SerialPort.parsers.readline('\n')
@@ -20,11 +19,14 @@ const client = require('twilio')(accountSID, authToken);
 
 const saveInterval = 1000,
       fiveMinutes = 300000;
+      
 let newPoint = {},
     uploading = false,
     lastCall = 0,
     lastDelete = 0;
 
+// database
+const uristring = cfg.uristring;
 mongoose.connect(uristring, function(err, res) {
     if (err) {
         console.log("Error: " + err);
@@ -69,20 +71,19 @@ const checkCall = function(count) {
 }
 
 const save = setInterval(function() {
-    console.log(lastDelete);
     if (Date.now() > lastDelete + 172800000) {
         model.find({}).exec(function(err, data) {
             const now = new Date(Date.now()).toString().split(' ').slice(0,5).join(' ');
-            const stream = fs.createWriteStream('./files/' + now + '_JSON_Output.txt');
-            stream.write(JSON.stringify(data));
-            stream.on('finish', function() {
-                model.find({}).remove(function(err, res) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log('Successfully written and deleted documents.');
-                    }
-                });
+            fs.writeFile("./files/" + now + "-JSON.txt", JSON.stringify(data), function(err) {
+                if (!err) {
+                    model.find({}).remove(function(err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log('Successfully written and deleted documents.');
+                        }
+                    });
+                }   
             });
         });
         lastDelete = Date.now();
